@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "794722730903",
+    "project_id": "uraine-platform",
+    "storage_bucket": "uraine-platform.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794722730903:android:aacc30602a63f7533abad2",
+        "android_client_info": {
+          "package_name": "com.example.uraine_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOx2fwbKq_4wQF9C0XkPD0Vo3FDBZZYq4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794722730903:android:a29a4154dafe8e923abad2",
+        "android_client_info": {
+          "package_name": "com.example.uraine_web"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOx2fwbKq_4wQF9C0XkPD0Vo3FDBZZYq4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
