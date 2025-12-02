@@ -10,7 +10,7 @@ import 'package:uraine_web/screens/reports_screen.dart';
 import 'package:uraine_web/screens/settings_screen.dart';
 
 class MainShell extends StatefulWidget {
-  const MainShell({Key? key}) : super(key: key);
+  const MainShell({super.key});
 
   @override
   _MainShellState createState() => _MainShellState();

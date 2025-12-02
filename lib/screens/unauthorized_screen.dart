@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:uraine_web/services/auth_service.dart'; // Importujeme service
 
 class UnauthorizedScreen extends StatelessWidget {
-  const UnauthorizedScreen({Key? key}) : super(key: key);
+  const UnauthorizedScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

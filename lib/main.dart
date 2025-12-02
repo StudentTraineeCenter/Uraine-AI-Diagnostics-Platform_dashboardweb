@@ -21,7 +21,7 @@ void main() async {
 }
 
 class UraineMdApp extends StatelessWidget {
-  const UraineMdApp({Key? key}) : super(key: key);
+  const UraineMdApp({super.key});
 
   @override
   Widget build(BuildContext context) {

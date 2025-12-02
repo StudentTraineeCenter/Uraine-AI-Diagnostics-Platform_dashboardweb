@@ -5,7 +5,7 @@ import 'package:uraine_web/services/auth_service.dart'; // Importuj service
 
 class LoginScreen extends StatefulWidget {
   // Tento konštruktor sme minule nemali ako 'const', preto bola chyba v auth_wrapperi
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   // Táto funkcia chýbala v tvojom kóde, preto chyba 'createState'
   @override

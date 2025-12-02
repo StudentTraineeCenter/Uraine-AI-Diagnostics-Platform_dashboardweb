@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -171,11 +171,11 @@ class DashboardCard extends StatelessWidget {
   final double width;
 
   const DashboardCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.child,
     this.width = 300, // Predvolená šírka
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

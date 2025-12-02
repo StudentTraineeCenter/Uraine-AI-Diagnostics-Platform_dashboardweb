@@ -20,7 +20,7 @@ class _DummyPatient {
 }
 
 class PatientListScreen extends StatelessWidget {
-  const PatientListScreen({Key? key}) : super(key: key);
+  const PatientListScreen({super.key});
 
   // Vytvoríme si zoznam našich falošných (dummy) pacientov
   final List<_DummyPatient> _dummyPatients = const [

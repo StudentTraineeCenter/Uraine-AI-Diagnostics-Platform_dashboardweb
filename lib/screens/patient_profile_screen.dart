@@ -9,9 +9,9 @@ class PatientProfileScreen extends StatelessWidget {
   final String patientName;
 
   const PatientProfileScreen({
-    Key? key,
+    super.key,
     required this.patientName, // Meno dostaneme z predchádzajúcej obrazovky
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
