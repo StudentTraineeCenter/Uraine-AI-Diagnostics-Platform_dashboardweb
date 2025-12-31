@@ -1,9 +1,8 @@
 // lib/screens/main_shell.dart
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:uraine_web/services/auth_service.dart';
-
-// Importujeme naše 4 obrazovky
 import 'package:uraine_web/screens/dashboard_screen.dart';
 import 'package:uraine_web/screens/patient_list_screen.dart';
 import 'package:uraine_web/screens/reports_screen.dart';
@@ -18,7 +17,8 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _selectedIndex = 0;
-
+  
+  // Zoznam obrazoviek
   static const List<Widget> _screens = <Widget>[
     DashboardScreen(),
     PatientListScreen(),
@@ -26,148 +26,115 @@ class _MainShellState extends State<MainShell> {
     SettingsScreen(),
   ];
 
-  // Mapovanie indexu na názov obrazovky pre horný panel
   static const List<String> _screenTitles = [
-    "Dashboard",
-    "Zoznam Pacientov",
-    "Reporty",
-    "Nastavenia"
+    "Prehľad Ambulancie",
+    "Databáza Pacientov",
+    "Lekárske Reporty",
+    "Nastavenia Platformy"
   ];
 
   @override
   Widget build(BuildContext context) {
+    // HARDCODED ÚDAJE LEKÁRA (Pre konzistenciu)
+    const String doctorName = "MUDr. Milan Smieško";
+    const String doctorEmail = "milansmiesko4@gmail.com";
+
     return Scaffold(
-      
-      // KROK 1: Pridávame horný panel (AppBar)
       appBar: AppBar(
-        // Nastavíme bielu farbu pozadia a čierny text
         backgroundColor: Colors.white,
-        elevation: 1.0, // Jemný tieň
-        iconTheme: const IconThemeData(color: Colors.black),
-        
-        // Názov sa bude meniť podľa toho, kde sme
+        elevation: 1,
+        shadowColor: Colors.black12,
         title: Text(
           _screenTitles[_selectedIndex],
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: Color(0xFF2C3E50), fontWeight: FontWeight.w800),
         ),
-        
-        // Komponenty na pravej strane AppBar-u
         actions: [
-          // 1. Vyhľadávací panel (zatiaľ len vizuálny)
-          Container(
-            width: 300,
-            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: const TextField(
-              decoration: InputDecoration(
-                hintText: "Vyhľadať pacienta...",
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                ),
-                contentPadding: EdgeInsets.zero, // Zmenšíme výšku
+          // Profil vpravo hore
+          Padding(
+            padding: const EdgeInsets.only(right: 24.0),
+            child: PopupMenuButton<String>(
+              offset: const Offset(0, 50),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: const Color(0xFF4A90E2),
+                    child: Text("MS", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(doctorName, style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 14)),
+                      Text("Urológia - Ambulancia", style: TextStyle(color: Colors.green, fontSize: 12)),
+                    ],
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                ],
               ),
-            ),
-          ),
-
-          // 2. Profil lekára a odhlásenie
-          PopupMenuButton<String>(
-            offset: const Offset(0, 40), // Posunieme menu trochu nižšie
-            onSelected: (value) {
-              if (value == 'logout') {
-                AuthService().signOut();
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'profile',
-                child: Text('Môj profil'),
-              ),
-              const PopupMenuDivider(),
-              PopupMenuItem<String>(
-                value: 'logout',
-                child: Text('Odhlásiť sa', style: TextStyle(color: Colors.red)),
-              ),
-            ],
-            // Toto je tlačidlo, ktoré vidíš (profil)
-            child: Row(
-              children: const [
-                CircleAvatar(
-                  // TODO: Pridať reálnu fotku
-                  backgroundColor: Colors.blueAccent,
-                  child: Text("DS", style: TextStyle(color: Colors.white)),
-                ),
-                SizedBox(width: 8),
-                Text(
-                  "Dr. Smieško", // TODO: Načítať reálne meno
-                  style: TextStyle(color: Colors.black),
-                ),
-                SizedBox(width: 16),
+              onSelected: (val) {
+                if (val == 'logout') AuthService().signOut();
+              },
+              itemBuilder: (_) => [
+                const PopupMenuItem(enabled: false, child: Text(doctorEmail, style: TextStyle(fontSize: 12, color: Colors.grey))),
+                const PopupMenuItem(value: 'logout', child: Text("Odhlásiť sa", style: TextStyle(color: Colors.red))),
               ],
             ),
-          ),
+          )
         ],
       ),
-      
-      // KROK 2: Telo aplikácie (Row s bočným panelom)
       body: Row(
-        children: <Widget>[
-          // 1. STĹPEC: Bočný navigačný panel
+        children: [
+          // BOČNÝ PANEL
           NavigationRail(
             selectedIndex: _selectedIndex,
-            onDestinationSelected: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            // Zmeníme typ, aby sa text zobrazoval len pri aktívnej položke
-            labelType: NavigationRailLabelType.selected,
-            backgroundColor: const Color(0xFFF8F9FA), // Svetlé pozadie
+            onDestinationSelected: (int index) => setState(() => _selectedIndex = index),
+            extended: true,
+            minExtendedWidth: 240,
+            backgroundColor: Colors.white,
+            selectedIconTheme: const IconThemeData(color: Color(0xFF1565C0)), 
+            selectedLabelTextStyle: const TextStyle(color: Color(0xFF1565C0), fontWeight: FontWeight.bold, fontSize: 15),
+            unselectedLabelTextStyle: const TextStyle(color: Color(0xFF607D8B), fontWeight: FontWeight.w500),
             
-            // Pridáme logo URAINE MD hore 
-            leading: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: Column(
-                children: const [
-                  // TODO: Sem vložiť reálne logo
-                  Icon(Icons.medical_services, color: Colors.blue, size: 30),
-                  Text("URAINE MD", style: TextStyle(fontWeight: FontWeight.bold)),
+            leading: Container(
+              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF4A90E2).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.health_and_safety_rounded, color: Color(0xFF4A90E2), size: 32),
+                  ),
+                  const SizedBox(width: 12),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("URAINE", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF2C3E50))),
+                      Text("MD PLATFORM", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Color(0xFF4A90E2), letterSpacing: 1.0)),
+                    ],
+                  ),
                 ],
               ),
             ),
             
-            destinations: const <NavigationRailDestination>[
-              NavigationRailDestination(
-                icon: Icon(Icons.dashboard_outlined),
-                selectedIcon: Icon(Icons.dashboard),
-                label: Text('Dashboard'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.people_alt_outlined),
-                selectedIcon: Icon(Icons.people_alt),
-                label: Text('Pacienti'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.bar_chart_outlined),
-                selectedIcon: Icon(Icons.bar_chart),
-                label: Text('Reporty'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.settings_outlined),
-                selectedIcon: Icon(Icons.settings),
-                label: Text('Nastavenia'),
-              ),
+            destinations: const [
+              NavigationRailDestination(icon: Icon(Icons.dashboard_outlined), selectedIcon: Icon(Icons.dashboard), label: Text('Prehľad')),
+              NavigationRailDestination(icon: Icon(Icons.people_outline), selectedIcon: Icon(Icons.people), label: Text('Pacienti')),
+              NavigationRailDestination(icon: Icon(Icons.assessment_outlined), selectedIcon: Icon(Icons.assessment), label: Text('Reporty')),
+              NavigationRailDestination(icon: Icon(Icons.settings_outlined), selectedIcon: Icon(Icons.settings), label: Text('Nastavenia')),
             ],
           ),
           
-          const VerticalDivider(thickness: 1, width: 1),
-
-          // 2. STĹPEC: Hlavný obsah
+          const VerticalDivider(thickness: 1, width: 1, color: Color(0xFFEEEEEE)),
+          
+          // HLAVNÝ OBSAH
           Expanded(
             child: Container(
-              // Dáme obsahu sivé pozadie, aby karty vynikli
-              color: const Color(0xFFF0F2F5),
-              // Pridáme padding, aby obsah nebol nalepený na okrajoch
-              padding: const EdgeInsets.all(24.0),
+              color: const Color(0xFFF5F7FA),
               child: _screens[_selectedIndex],
             ),
           ),
