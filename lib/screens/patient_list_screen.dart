@@ -1,9 +1,11 @@
 // lib/screens/patient_list_screen.dart
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uraine_web/services/dashboard_service.dart';
 import 'package:uraine_web/screens/patient_profile_screen.dart';
+import 'package:uraine_web/theme/app_colors.dart';
 
 class PatientListScreen extends StatelessWidget {
   const PatientListScreen({super.key});
@@ -63,7 +65,6 @@ class PatientListScreen extends StatelessWidget {
                 boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
               ),
               child: StreamBuilder<List<PatientSummary>>(
-                // Toto zabezpečuje, že vidíš unikátnych ľudí z DB
                 stream: dashboardService.getPatientsStream(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -76,13 +77,12 @@ class PatientListScreen extends StatelessWidget {
                         children: const [
                           Icon(Icons.folder_off_outlined, size: 48, color: Colors.grey),
                           SizedBox(height: 16),
-                          Text("Zatiaľ žiadni pacienti v databáze.", style: TextStyle(color: Colors.grey, fontSize: 16)),
+                          Text("Zatiaľ žiadne dáta o pacientoch.", style: TextStyle(color: Colors.grey, fontSize: 16)),
                         ],
                       ),
                     );
                   }
 
-                  // Máme dáta z DB
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: SingleChildScrollView(
@@ -101,26 +101,46 @@ class PatientListScreen extends StatelessWidget {
                         rows: snapshot.data!.map((patient) {
                           return DataRow(
                             cells: [
+                              // 1. BUNKA - MENO PACIENTA (Načítané z users kolekcie)
                               DataCell(
-                                Row(children: [
-                                  CircleAvatar(
-                                    backgroundColor: const Color(0xFFE3F2FD),
-                                    radius: 18,
-                                    child: const Icon(Icons.person, color: Color(0xFF1565C0), size: 18),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      // Zobrazíme ID (neskôr môžeme nahradiť menom z kolekcie Users)
-                                      Text("Pacient ${patient.userId.substring(0, 6)}", style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2C3E50))),
-                                      Text(patient.userId, style: const TextStyle(fontSize: 10, color: Colors.grey)),
-                                    ],
-                                  ),
-                                ]),
+                                FutureBuilder<DocumentSnapshot>(
+                                  future: FirebaseFirestore.instance.collection('users').doc(patient.userId).get(),
+                                  builder: (context, userSnapshot) {
+                                    String displayName = "Načítavam...";
+                                    String email = patient.userId; // Defaultne zobrazime ID
+
+                                    if (userSnapshot.hasData && userSnapshot.data != null && userSnapshot.data!.exists) {
+                                      final userData = userSnapshot.data!.data() as Map<String, dynamic>;
+                                      // Skúsime nájsť 'fullName', 'name' alebo 'email'
+                                      displayName = userData['fullName'] ?? userData['name'] ?? 'Neznámy';
+                                      email = userData['email'] ?? patient.userId;
+                                    } else if (userSnapshot.connectionState == ConnectionState.done) {
+                                      displayName = "Neznámy použivateľ";
+                                    }
+
+                                    return Row(children: [
+                                      CircleAvatar(
+                                        backgroundColor: const Color(0xFFE3F2FD),
+                                        radius: 18,
+                                        child: Text(displayName.isNotEmpty ? displayName[0].toUpperCase() : "?", 
+                                          style: const TextStyle(color: Color(0xFF1565C0), fontWeight: FontWeight.bold)),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(displayName, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2C3E50))),
+                                          Text(email, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                                        ],
+                                      ),
+                                    ]);
+                                  }
+                                ),
                               ),
+                              // 2. BUNKA - DÁTUM
                               DataCell(Text(DateFormat('dd.MM.yyyy  HH:mm').format(patient.lastUpdate))),
+                              // 3. BUNKA - VÝSLEDOK
                               DataCell(Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,6 +149,7 @@ class PatientListScreen extends StatelessWidget {
                                   Text(patient.lastClarity, style: const TextStyle(fontSize: 12, color: Colors.grey)),
                                 ],
                               )),
+                              // 4. BUNKA - STAV
                               DataCell(
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -149,13 +170,15 @@ class PatientListScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                              // 5. BUNKA - AKCIA
                               DataCell(
                                 ElevatedButton(
                                   onPressed: () {
                                     Navigator.push(context, MaterialPageRoute(
                                       builder: (context) => PatientProfileScreen(
                                         userId: patient.userId, 
-                                        patientName: "Pacient ${patient.userId.substring(0, 6)}"
+                                        // Meno sa dorieši v Profile Screen cez stream
+                                        patientName: "Načítavam...", 
                                       )
                                     ));
                                   },

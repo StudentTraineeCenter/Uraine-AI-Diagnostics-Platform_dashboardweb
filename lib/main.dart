@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:uraine_web/firebase_options.dart';
-import 'package:uraine_web/screens/main_shell.dart'; // Importuj Shell
+import 'package:uraine_web/auth_wrapper.dart'; // Uisti sa, že import sedí
 import 'package:uraine_web/theme/app_colors.dart';
 
 void main() async {
@@ -21,7 +21,7 @@ class UraineMdApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'URAINE MD Portál',
-      debugShowCheckedModeBanner: false, // Odstráni "Debug" banner
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: AppColors.primaryBlue,
         scaffoldBackgroundColor: AppColors.background,
@@ -31,9 +31,8 @@ class UraineMdApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      // Tu voláme náš nový Shell namiesto AuthWrapperu (zatiaľ, pre testovanie dizajnu)
-      // Ak máš fungujúci AuthWrapper, zabaľ MainShell do neho.
-      home: const MainShell(), 
+      // VRÁTIME AUTH WRAPPER - Toto zabezpečí prihlásenie a prístup k DB
+      home: const AuthWrapper(), 
     );
   }
 }

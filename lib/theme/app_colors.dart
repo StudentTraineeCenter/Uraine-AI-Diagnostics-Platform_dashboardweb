@@ -11,7 +11,11 @@ class AppColors {
   static const Color white = Colors.white;
   static const Color textGrey = Color(0xFF7F8C8D);
 
-  // TOTO TU CHÝBALO:
+  // --- PRIDANÉ CHÝBAJÚCE FARBY (FIX) ---
+  static const Color textDark = Color(0xFF2C3E50); // Tmavá pre texty
+  static const Color secondaryGreen = Color(0xFF2ECC71); // Sekundárna zelená
+  // -------------------------------------
+
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
     begin: Alignment.topLeft,
